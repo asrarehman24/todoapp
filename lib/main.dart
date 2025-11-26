@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/counter_screen.dart';
-import 'screens/todo_screen.dart';
+import 'package:todoapp/screens/login_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,10 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Week 2 - Data Management',
+      title: 'Task Management App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const CounterScreen(), // Start with Counter app
-      routes: {'/todo': (context) => const TodoScreen()},
+      home: const LoginScreen(),
     );
   }
 }
