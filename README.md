@@ -48,7 +48,8 @@ A **Todo List App** with **state management** and **persistent storage** using `
 * Simple ListView to display tasks.
 * Counter app demonstrating basic state changes.
 * Add tasks only (delete feature is not included for Week 2).
-
+### **Screenshots**
+![Counter App](<Screenshot 2025-11-26 191735.png>)
 ---
 
 ## **Week 3: Final Task Management App**
@@ -79,7 +80,7 @@ A **Task Management App** combining everything learned:
 ### **Prerequisites**
 
 * Flutter SDK installed: [Flutter Install Guide](https://docs.flutter.dev/get-started/install)
-* Android Studio / VS Code
+*  VS Code
 * Git (for version control)
 
 ### **Clone the Repository**
@@ -103,33 +104,6 @@ flutter pub get
 flutter run
 ```
 
-* For Web:
-
-```bash
-flutter run -d chrome
-```
-
-* For Windows (Desktop):
-
-```bash
-flutter run -d windows
-```
-
----
-
-## **Project Structure**
-
-```
-lib/
-├─ main.dart
-├─ screens/
-│  ├─ login_screen.dart
-│  ├─ home_screen.dart
-│  └─ todo_screen.dart
-└─ models/
-   └─ task.dart
-```
-
 ---
 
 ## **Notes**
@@ -148,11 +122,3 @@ lib/
 * **v3.0** – Week 3: Final Task Management App with add/delete/complete
 
 ---
-
-This README gives a clear overview of all three weeks and guides someone to **run the project locally**.
-
----
-
-If you want, I can also **add sample commands for Git tagging each week** so your repo is fully versioned and professional.
-
-Do you want me to do that?
