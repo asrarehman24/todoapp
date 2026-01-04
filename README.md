@@ -1,10 +1,53 @@
-# **Flutter Learning Projects: Week 1-3**
+# **Flutter Learning Projects: Week 1-6**
 
 ## **Overview**
 
-This repository contains Flutter projects developed over **Weeks 1 to 3** as part of a practical learning program. The focus is on learning **UI creation, state management, persistent storage**, and building a **Task Management App**.
+This repository contains Flutter projects developed over **Weeks 1 to 6** as part of a practical learning program. The focus is on learning **UI creation, state management, persistent storage, API integration, Firebase services**, and **advanced state management with Provider**, building a comprehensive **Task Management App**.
 
 ---
+
+## **Week 1: Basic Flutter UI and Navigation**
+
+### **App Description**
+
+A **Login App** with simple UI:
+
+* Login screen with **email** and **password** fields.
+* **Login button** and "Forgot Password?" link.
+* Navigation to **Home Screen** using `Navigator.push()`.
+
+### **Features**
+
+* Basic layout using `Column`, `Row`, `Container`.
+* Input validation:
+
+  * Email must be in proper format.
+  * Password cannot be empty.
+* Navigation between screens.
+
+### **Screenshots**
+
+![LoginView](<Screenshot 2025-11-26 190321.png>)
+
+---
+
+## **Week 2: Data Management and Persistent Storage**
+
+### **App Description**
+
+A **Todo List App** with **state management** and **persistent storage** using `SharedPreferences`:
+
+* Add tasks to a list.
+* Tasks persist even after app restart.
+* Basic counter app using `setState` to learn state management.
+
+### **Features**
+
+* State management using `setState`.
+* Persistent storage via `SharedPreferences`.
+* Simple ListView to display tasks.
+* Counter app demonstrating basic state changes.
+* Add tasks only (delete feature is not included for Week 2).
 
 ## **Week 1: Basic Flutter UI and Navigation**
 
@@ -197,6 +240,73 @@ users/{userId}
 
 ---
 
+## **Week 6: Advanced State Management with Provider**
+
+### **App Description**
+
+Enhanced the Task Management App with **Provider pattern** for scalable state management:
+
+* Refactored from `setState` to Provider for better architecture.
+* Centralized state management with `TaskProvider`.
+* Real-time UI updates with automatic rebuilds.
+* Enhanced animations and user experience.
+* Improved code maintainability and testability.
+
+### **Features**
+
+* **Provider State Management**: Replaced `setState` with `ChangeNotifier` and `Consumer`.
+* **TaskProvider Class**: Centralized task operations (CRUD) with automatic persistence.
+* **Real-time UI Updates**: Widgets automatically rebuild when state changes.
+* **Enhanced Animations**: Scale animations for task items, smooth transitions.
+* **Advanced Task Operations**: Edit tasks, clear completed tasks, clear all tasks.
+* **Task Statistics**: Live counters for total, completed, and pending tasks.
+* **Improved UX**: Swipe-to-delete, dismissible cards, better empty states.
+* **Loading States**: Proper loading indicators during async operations.
+
+### **Provider Architecture**
+
+```dart
+class TaskProvider with ChangeNotifier {
+  List<Task> _tasks = [];
+  bool _isLoading = false;
+
+  // Getters for reactive UI updates
+  List<Task> get tasks => _tasks;
+  bool get isLoading => _isLoading;
+  int get totalTasks => _tasks.length;
+  int get completedTaskCount => _tasks.where((task) => task.isDone).length;
+  List<Task> get pendingTasks => _tasks.where((task) => !task.isDone).toList();
+
+  // CRUD operations with automatic persistence
+  void addTask(String title);
+  void deleteTask(int index);
+  void toggleTask(int index);
+  void updateTask(int index, String newTitle);
+  void clearCompletedTasks();
+  void clearAllTasks();
+}
+```
+
+### **UI Enhancements**
+
+* **Animated Task Items**: Scale animation on creation with `AnimationController`.
+* **Dismissible Cards**: Swipe-to-delete functionality with visual feedback.
+* **Task Statistics Bar**: Real-time counters in the app bar.
+* **Enhanced Dialogs**: Edit task functionality with input validation.
+* **Improved Empty State**: Better messaging and visual design.
+* **Material Design 3**: Updated theme with enhanced card styling.
+
+### **Benefits of Provider**
+
+* **Separation of Concerns**: UI and business logic are decoupled.
+* **Automatic Updates**: No manual `setState` calls needed.
+* **Scalability**: Easy to add new features and screens.
+* **Testability**: State logic can be tested independently.
+* **Performance**: Only affected widgets rebuild.
+* **Maintainability**: Cleaner, more organized codebase.
+
+---
+
 ## **Setup Instructions**
 
 ### **Prerequisites**
@@ -268,16 +378,7 @@ firebase deploy --only firestore:rules
 ```bash
 flutter run
 ```
-
-#### **For iOS:**
-```bash
-flutter run
-```
-
-#### **For Web:**
-```bash
-flutter run -d chrome
-```
+`
 
 ### **Build for Production**
 
@@ -286,10 +387,7 @@ flutter run -d chrome
 flutter build apk --release
 ```
 
-#### **iOS (on macOS):**
-```bash
-flutter build ios --release
-```
+
 
 ### **Project Structure**
 
@@ -298,13 +396,15 @@ todoapp/
 ├── android/                 # Android native code
 ├── ios/                     # iOS native code
 ├── lib/                     # Flutter source code
-│   ├── main.dart           # App entry point
+│   ├── main.dart           # App entry point with Provider setup
 │   ├── firebase_options.dart # Firebase configuration
 │   ├── models/             # Data models
 │   │   └── task.dart       # Task model
+│   ├── providers/          # State management (Week 6)
+│   │   └── task_provider.dart # Provider for task state
 │   ├── screens/            # UI screens
 │   │   ├── login_screen.dart      # Authentication
-│   │   ├── home_screen.dart       # Task management
+│   │   ├── home_screen.dart       # Task management (Provider)
 │   │   ├── api_demo_screen.dart   # API demonstration
 │   │   └── user_profile_screen.dart # User profile
 │   └── services/           # Business logic
@@ -323,14 +423,6 @@ todoapp/
 - Android device or emulator
 - Minimum SDK: API 23 (Android 6.0)
 
-#### **iOS Development (macOS only):**
-- Xcode 15+
-- iOS Simulator or physical device
-- CocoaPods installed
-
-#### **Web Development:**
-- Chrome browser
-- Web server for hosting
 
 ### **Troubleshooting**
 
@@ -350,19 +442,8 @@ flutter pub get
 flutter build apk --debug
 ```
 
-**3. iOS Build Issues:**
-```bash
-# Clean iOS build
-flutter clean
-cd ios
-pod install
-cd ..
-flutter build ios
-```
-
 **4. Firebase Configuration:**
 - Ensure `google-services.json` is in `android/app/`
-- Ensure `GoogleService-Info.plist` is in `ios/Runner/`
 - Verify `firebase_options.dart` has correct values
 
 **5. Network Issues:**
@@ -386,35 +467,6 @@ flutter clean
 flutter pub cache clean
 ```
 
-### **Testing**
-
-#### **Run Unit Tests:**
-```bash
-flutter test
-```
-
-#### **Run Integration Tests:**
-```bash
-flutter drive --target=test_driver/app.dart
-```
-
-### **Deployment**
-
-#### **Firebase Hosting (Web):**
-```bash
-flutter build web
-firebase deploy --only hosting
-```
-
-#### **Google Play Store:**
-1. Build release APK: `flutter build apk --release`
-2. Sign the APK with your keystore
-3. Upload to Google Play Console
-
-#### **App Store (iOS):**
-1. Build for iOS: `flutter build ios --release`
-2. Open Xcode and archive the app
-3. Upload to App Store Connect
 
 ## **Notes**
 
@@ -423,16 +475,18 @@ firebase deploy --only hosting
 * **Week 3**: Combines all concepts into a functional **Task Management App**
 * **Week 4**: Adds **HTTP requests** and **API integration** with error handling
 * **Week 5**: Implements **Firebase Authentication** and **Cloud Firestore** integration
+* **Week 6**: Advanced **state management with Provider pattern** for scalable architecture
 
 ### **Technologies Used**
 
 * **Framework**: Flutter
 * **Language**: Dart
-* **State Management**: setState, Provider pattern
+* **State Management**: setState (Weeks 1-5), Provider pattern (Week 6)
 * **Local Storage**: SharedPreferences
 * **Network**: HTTP package, Dio
 * **Backend**: Firebase Authentication, Cloud Firestore
 * **Database**: Firestore (NoSQL), SharedPreferences (local)
+* **Architecture**: Provider, MVVM Pattern
 
 ### **Architecture**
 
@@ -454,13 +508,14 @@ firebase deploy --only hosting
 
 ## **Versioning & Changelog**
 
-### **Current Version: v5.0**
+### **Current Version: v6.0**
 
 * **v1.0** – Week 1: Basic login UI and navigation
 * **v2.0** – Week 2: Todo list with SharedPreferences persistence
 * **v3.0** – Week 3: Complete Task Management App (add/delete/complete tasks)
 * **v4.0** – Week 4: HTTP API integration with JSONPlaceholder
 * **v5.0** – Week 5: Firebase Authentication and Firestore integration
+* **v6.0** – Week 6: Provider state management and enhanced UX
 
 ### **Features by Version**
 
@@ -499,13 +554,29 @@ firebase deploy --only hosting
 - ✅ Secure authentication flow
 - ✅ Profile management and sign out
 
+#### **v6.0 - Provider State Management**
+- ✅ Provider pattern implementation
+- ✅ TaskProvider with ChangeNotifier
+- ✅ Real-time UI updates without setState
+- ✅ Enhanced animations and transitions
+- ✅ Task editing functionality
+- ✅ Bulk operations (clear completed/all)
+- ✅ Live task statistics
+- ✅ Swipe-to-delete with animations
+- ✅ Improved empty states and loading indicators
+- ✅ Scalable architecture for future features
+
 ### **Upcoming Features (Future Versions)**
-- 🔄 Push notifications
-- 🔄 Social login (Google, Facebook)
-- 🔄 Task sharing and collaboration
-- 🔄 Offline support with sync
-- 🔄 Advanced task categories and tags
-- 🔄 Task reminders and due dates
+- 🔄 Push notifications with Firebase Cloud Messaging
+- 🔄 Social login (Google, Facebook, Apple)
+- 🔄 Task sharing and collaboration features
+- 🔄 Offline support with data synchronization
+- 🔄 Advanced task categories, tags, and filtering
+- 🔄 Task reminders and due dates with local notifications
+- 🔄 Dark mode theme support
+- 🔄 Task priority levels and sorting
+- 🔄 Data export/import functionality
+- 🔄 Multi-language support (i18n)
 
 ---
 
@@ -527,33 +598,6 @@ firebase deploy --only hosting
 - **Firestore**: NoSQL document database
 - **Security Rules**: User-specific data access
 
-### **Internal API Structure**
-
-#### **ApiService Class**
-```dart
-class ApiService {
-  Future<List<dynamic>> fetchPosts();
-  Future<List<dynamic>> fetchUsers();
-  Future<Map<String, dynamic>> fetchUser(int id);
-}
-```
-
-#### **FirebaseService Class**
-```dart
-class FirebaseService {
-  // Authentication
-  Future<UserCredential> signUp(String email, String password);
-  Future<UserCredential> signIn(String email, String password);
-  Future<void> signOut();
-  
-  // Firestore
-  Future<void> saveUserProfile(String uid, String name, String email);
-  Future<Map<String, dynamic>?> getUserProfile(String uid);
-  Future<void> createOrUpdateProfile(String uid, Map<String, dynamic> data);
-}
-```
-
-### **Data Models**
 
 #### **Task Model**
 ```dart
@@ -564,6 +608,30 @@ class Task {
   Task({required this.title, this.isDone = false});
   Map<String, dynamic> toMap();
   factory Task.fromMap(Map<String, dynamic> map);
+}
+```
+
+#### **TaskProvider (Week 6)**
+```dart
+class TaskProvider with ChangeNotifier {
+  // Reactive properties
+  List<Task> get tasks => _tasks;
+  bool get isLoading => _isLoading;
+  int get totalTasks => _tasks.length;
+  int get completedTaskCount => _tasks.where((task) => task.isDone).length;
+  List<Task> get pendingTasks => _tasks.where((task) => !task.isDone).toList();
+  
+  // CRUD operations
+  void addTask(String title);
+  void deleteTask(int index);
+  void toggleTask(int index);
+  void updateTask(int index, String newTitle);
+  void clearCompletedTasks();
+  void clearAllTasks();
+  
+  // Persistence
+  Future<void> _saveTasks();
+  Future<void> _loadTasks();
 }
 ```
 
@@ -605,49 +673,6 @@ class Task {
    flutter test
    ```
 
-6. **Make your changes** and test thoroughly
-
-7. **Commit your changes**:
-   ```bash
-   git commit -am "Add your feature description"
-   ```
-
-8. **Push to your branch**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-9. **Create a Pull Request**
-
-### **Code Style**
-
-- Follow Dart/Flutter best practices
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Write unit tests for new features
-- Ensure code passes `flutter analyze`
-
-### **Testing**
-
-- Write unit tests for business logic
-- Test UI components on multiple screen sizes
-- Test error scenarios and edge cases
-- Verify Firebase integration works correctly
-
-### **Reporting Issues**
-
-When reporting bugs, please include:
-- Flutter version (`flutter --version`)
-- Device/emulator information
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots/logs if applicable
-
----
-
-## **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -661,12 +686,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## **Contact**
 
-For questions or suggestions:
-- **GitHub Issues**: [Report bugs or request features](https://github.com/asrarehman24/todoapp/issues)
-- **Email**: [Your contact email]
 
----
-
-*Last updated: January 4, 2026*
