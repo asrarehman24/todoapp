@@ -75,6 +75,42 @@ A **Task Management App** combining everything learned:
 
 ---
 
+## **Week 4: HTTP Requests and API Integration**
+
+### **App Description**
+
+Enhanced the Task Management App with **HTTP requests** and **API integration**:
+
+* Fetch data from public APIs (JSONPlaceholder).
+* Parse JSON responses.
+* Display data in ListView.
+* User Profile Screen with API data.
+* Robust error handling and loading indicators.
+
+### **Features**
+
+* **HTTP Requests**: Using the `http` package to fetch posts and user data.
+* **JSON Parsing**: Automatic parsing of API responses.
+* **ListView Display**: Posts displayed in a scrollable list with cards.
+* **User Profile Screen**: Displays user details including name, email, and contact info.
+* **Error Handling**: Comprehensive error messages for failed requests.
+* **Loading Indicators**: Circular progress indicators during data fetching.
+* **Retry Functionality**: Users can retry failed requests.
+
+### **API Endpoints Used**
+
+* `https://jsonplaceholder.typicode.com/posts` - Fetch posts
+* `https://jsonplaceholder.typicode.com/users` - Fetch users
+* `https://jsonplaceholder.typicode.com/users/{id}` - Fetch single user
+
+### **Navigation**
+
+Access the new features through the menu button (three dots) in the Task Manager app bar:
+* **API Demo**: View posts from the API
+* **User Profile**: View user profile information
+
+---
+
 ## **Setup Instructions**
 
 ### **Prerequisites**
@@ -111,6 +147,7 @@ flutter run
 * Week 1 focuses on **UI and navigation**.
 * Week 2 focuses on **state management** and **persistent storage**.
 * Week 3 combines **all concepts** into a functional **Task Management App**.
+* Week 4 adds **HTTP requests** and **API integration** with error handling.
 * SharedPreferences is used for data persistence in Week 2 and 3 apps.
 
 ---
@@ -120,5 +157,6 @@ flutter run
 * **v1.0** – Week 1: Login app
 * **v2.0** – Week 2: Todo list with persistence
 * **v3.0** – Week 3: Final Task Management App with add/delete/complete
+* **v4.0** – Week 4: HTTP requests and API integration
 
 ---
