@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todoapp/services/firebase_service.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -9,34 +10,90 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  final ApiService _apiService = ApiService();
-  Map<String, dynamic>? _user;
+  final FirebaseService _firebaseService = FirebaseService();
+  Map<String, dynamic>? _userProfile;
   bool _isLoading = true;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _fetchUser(1); // Fetch user with ID 1 as example
+    _fetchUserProfile();
   }
 
-  Future<void> _fetchUser(int id) async {
+  Future<void> _fetchUserProfile() async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
     try {
-      final user = await _apiService.fetchUser(id);
-      setState(() {
-        _user = user;
-        _isLoading = false;
-      });
+      final user = _firebaseService.currentUser;
+      if (user != null) {
+        print('Current user: ${user.uid}, email: ${user.email}'); // Debug log
+        final profile = await _firebaseService.getUserProfile(user.uid);
+
+        if (profile != null) {
+          print('Profile found: $profile'); // Debug log
+          setState(() {
+            _userProfile = profile;
+            _isLoading = false;
+          });
+        } else {
+          print('No profile found, creating one...'); // Debug log
+          // If no profile exists, create one from auth data
+          final newProfile = {
+            'name': user.displayName ?? user.email?.split('@')[0] ?? 'User',
+            'email': user.email ?? '',
+            'createdAt': DateTime.now().toIso8601String(),
+          };
+
+          await _firebaseService.saveUserProfile(
+            user.uid,
+            newProfile['name']!,
+            newProfile['email']!,
+          );
+
+          setState(() {
+            _userProfile = newProfile;
+            _isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _error = 'No user logged in. Please sign in first.';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
+      print('Error fetching profile: $e'); // Debug log
+      String errorMessage = 'Failed to load profile';
+      if (e.toString().contains('permission-denied')) {
+        errorMessage =
+            'Access denied. Please check your authentication and try again.';
+      } else if (e.toString().contains('unavailable')) {
+        errorMessage =
+            'Service temporarily unavailable. Please check your internet connection.';
+      }
       setState(() {
-        _error = e.toString();
+        _error = errorMessage;
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await _firebaseService.signOut();
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Sign out failed: $e')));
+      }
     }
   }
 
@@ -48,12 +105,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _fetchUser(1),
+            onPressed: _fetchUserProfile,
           ),
+          IconButton(icon: const Icon(Icons.logout), onPressed: _signOut),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading profile...'),
+                ],
+              ),
+            )
           : _error != null
           ? Center(
               child: Column(
@@ -68,14 +135,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => _fetchUser(1),
+                    onPressed: _fetchUserProfile,
                     child: const Text('Retry'),
                   ),
                 ],
               ),
             )
-          : _user == null
-          ? const Center(child: Text('No user data available'))
+          : _userProfile == null
+          ? const Center(child: Text('No profile data available'))
           : Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -87,7 +154,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     radius: 60,
                     backgroundColor: Colors.blue,
                     child: Text(
-                      _user!['name']?.substring(0, 1) ?? 'U',
+                      _userProfile!['name']?.substring(0, 1) ?? 'U',
                       style: const TextStyle(
                         fontSize: 40,
                         color: Colors.white,
@@ -97,7 +164,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    _user!['name'] ?? 'Unknown',
+                    _userProfile!['name'] ?? 'Unknown',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -105,7 +172,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _user!['email'] ?? 'No email',
+                    _userProfile!['email'] ?? 'No email',
                     style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
@@ -116,33 +183,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Contact Information',
+                            'Account Information',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _buildInfoRow('Phone', _user!['phone']),
-                          _buildInfoRow('Website', _user!['website']),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Address',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          _buildInfoRow('Email', _userProfile!['email']),
+                          _buildInfoRow('Name', _userProfile!['name']),
+                          if (_userProfile!['createdAt'] != null)
+                            _buildInfoRow(
+                              'Member Since',
+                              _formatTimestamp(_userProfile!['createdAt']),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${_user!['address']?['street'] ?? ''}, ${_user!['address']?['city'] ?? ''}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          Text(
-                            '${_user!['address']?['zipcode'] ?? ''}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
                         ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _signOut,
+                      icon: const Icon(Icons.logout),
+                      label: const Text('Sign Out'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ),
@@ -158,9 +226,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       child: Row(
         children: [
           Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(value ?? 'N/A'),
+          Expanded(child: Text(value ?? 'N/A')),
         ],
       ),
     );
+  }
+
+  String _formatTimestamp(dynamic timestamp) {
+    if (timestamp == null) return 'N/A';
+    try {
+      final date = (timestamp as Timestamp).toDate();
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return 'N/A';
+    }
   }
 }

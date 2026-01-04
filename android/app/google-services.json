@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "864585434364",
+    "project_id": "fire-auth-todoapp",
+    "storage_bucket": "fire-auth-todoapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864585434364:android:9d8a4503f74c3acd028379",
+        "android_client_info": {
+          "package_name": "com.example.todoapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACOE-jgS4jmy9mwxmVKXuvE7z9MpJCijs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

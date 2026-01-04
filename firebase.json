@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "fire-auth-todoapp",
+          "appId": "1:864585434364:android:9d8a4503f74c3acd028379",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "fire-auth-todoapp",
+          "configurations": {
+            "android": "1:864585434364:android:9d8a4503f74c3acd028379",
+            "web": "1:864585434364:web:534e7b3574ad9de5028379"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}
